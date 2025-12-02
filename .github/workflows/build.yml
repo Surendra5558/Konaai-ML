@@ -41,9 +41,9 @@ jobs:
           REG="us-central1"
 
           # Define image names in Google Artifact Registry
-          WEB_IMAGE="us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml-web"
-          WORKER_IMAGE="us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml-worker"
-          SCHEDULER_IMAGE="us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml-scheduler"
+          WEB_IMAGE="us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml"
+          WORKER_IMAGE="us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml"
+          SCHEDULER_IMAGE="us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml"
 
           # Tag the images built by docker-compose
           docker tag konaai-ml:web      $WEB_IMAGE:${{ github.sha }}
@@ -51,9 +51,9 @@ jobs:
           docker tag konaai-ml:scheduler $SCHEDULER_IMAGE:${{ github.sha }}
 
           # Push SHA tags
-          docker push us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml-web:${{ github.sha }}
-          docker push us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml-worker:${{ github.sha }}
-          docker push us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml-scheduler:${{ github.sha }}
+          docker push us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml:${{ github.sha }}
+          docker push us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml:${{ github.sha }}
+          docker push us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml:${{ github.sha }}
 
           # # Push "latest" tags
           # docker tag konaai-ml:web      $WEB_IMAGE:latest
