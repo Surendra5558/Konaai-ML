@@ -79,28 +79,28 @@ jobs:
 
       - name: Tag & Push images
         run: |
-          PROJECT="konaai-dev-462909"
-          REPO="konaai-gke"
-          REG="us-central1-docker.pkg.dev"
+          # PROJECT="konaai-dev-462909"
+          # REPO="konaai-gke"
+          # REG="us-central1-docker.pkg.dev"
 
-          WEB_IMAGE="$REG/$PROJECT/$REPO/web"
-          WORKER_IMAGE="$REG/$PROJECT/$REPO/worker"
-          SCHEDULER_IMAGE="$REG/$PROJECT/$REPO/scheduler"
+          # WEB_IMAGE="$REG/$PROJECT/$REPO/web"
+          # WORKER_IMAGE="$REG/$PROJECT/$REPO/worker"
+          # SCHEDULER_IMAGE="$REG/$PROJECT/$REPO/scheduler"
 
-          # Tag with SHA
-          docker tag konaai-ml:web $WEB_IMAGE:${{ github.sha }}
-          docker tag konaai-ml:worker $WORKER_IMAGE:${{ github.sha }}
-          docker tag konaai-ml:scheduler $SCHEDULER_IMAGE:${{ github.sha }}
+          # # Tag with SHA
+          # docker tag konaai-ml:web $WEB_IMAGE:${{ github.sha }}
+          # docker tag konaai-ml:worker $WORKER_IMAGE:${{ github.sha }}
+          # docker tag konaai-ml:scheduler $SCHEDULER_IMAGE:${{ github.sha }}
 
-          docker push $WEB_IMAGE:${{ github.sha }}
-          docker push $WORKER_IMAGE:${{ github.sha }}
-          docker push $SCHEDULER_IMAGE:${{ github.sha }}
+          # docker push $WEB_IMAGE:${{ github.sha }}
+          # docker push $WORKER_IMAGE:${{ github.sha }}
+          # docker push $SCHEDULER_IMAGE:${{ github.sha }}
 
-          # Push "latest" tag
-          docker tag konaai-ml:web $WEB_IMAGE:latest
-          docker tag konaai-ml:worker $WORKER_IMAGE:latest
-          docker tag konaai-ml:scheduler $SCHEDULER_IMAGE:latest
+          # # Push "latest" tag
+          # docker tag konaai-ml:web $WEB_IMAGE:latest
+          # docker tag konaai-ml:worker $WORKER_IMAGE:latest
+          # docker tag konaai-ml:scheduler $SCHEDULER_IMAGE:latest
 
-          docker push $WEB_IMAGE:latest
-          docker push $WORKER_IMAGE:latest
-          docker push $SCHEDULER_IMAGE:latest
+          docker push us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml:latest
+          docker push us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml:latest
+          docker push us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml:latest
