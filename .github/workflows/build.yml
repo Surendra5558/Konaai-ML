@@ -44,8 +44,8 @@ jobs:
           # WEB_IMAGE="$REG/$PROJECT/$REPO/web"
           # WORKER_IMAGE="$REG/$PROJECT/$REPO/worker"
           # SCHEDULER_IMAGE="$REG/$PROJECT/$REPO/scheduler"
-          IMAGE=us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml
-          docker tag konaai-ml:web us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml:${{ github.sha }}
+          IMAGE=us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke
+          docker tag konaai-ml:web us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke:${{ github.sha }}
           docker push us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml:${{ github.sha }}
 
           # # Tag the images built by docker-compose
