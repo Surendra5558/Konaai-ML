@@ -35,6 +35,9 @@ COPY pyproject.toml uv.lock /build/
 
 # Create venv + install dependencies
 RUN set -eux; \
+    # FIX: regenerate lockfile so --locked does not fail
+    uv lock; \
+    \
     uv export --locked --no-dev -o requirements.txt; \
     python -m venv "$VENV_PATH"; \
     "$VENV_PATH/bin/pip" install --upgrade pip; \
@@ -78,7 +81,7 @@ RUN set -eux; \
     ACCEPT_EULA=Y apt-get install -y msodbcsql18; \
     rm -rf /var/lib/apt/lists/*; \
     \
-    # Non-root user
+    # Non-root user setup
     groupadd -r kona || true; \
     useradd -r -m -g kona kona || true; \
     mkdir -p "$INTELLIGENCE_PATH"; \
