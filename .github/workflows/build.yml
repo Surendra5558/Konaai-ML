@@ -1,65 +1,97 @@
-name: GKE-Dev_API
+###############################################
+# STAGE 1 — BUILDER (creates venv + installs deps)
+###############################################
+FROM python:3.12-slim-bookworm AS builder
 
-on:
-  workflow_dispatch:
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    INTELLIGENCE_PATH=/KonaAI_ML/var \
+    VENV_PATH=/KonaAI_ML/.venv \
+    PATH="/root/.local/bin:${PATH}"
 
-jobs:
-  setup:
-    name: Setup GCP Auth
-    runs-on: ubuntu-latest
-    outputs:
-      creds: ${{ steps.auth.outputs.credentials }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+WORKDIR /build
 
-      - name: Set up Google Cloud auth
-        id: auth
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GKE_LOGIN_SERVER }}
+RUN set -eux; \
+    apt-get update && apt-get install -y --no-install-recommends \
+        build-essential curl gnupg ca-certificates \
+        unixodbc unixodbc-dev libgomp1; \
+    \
+    curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \
+        | gpg --dearmor -o /etc/apt/trusted.gpg.d/microsoft.gpg; \
+    echo "deb [arch=amd64] https://packages.microsoft.com/debian/12/prod bookworm main" \
+        > /etc/apt/sources.list.d/mssql-release.list; \
+    apt-get update; \
+    ACCEPT_EULA=Y apt-get install -y msodbcsql18; \
+    rm -rf /var/lib/apt/lists/*; \
+    \
+    curl -LsSf https://astral.sh/uv/install.sh | sh
 
-  build:
-    name: Build & Push Docker Compose Images
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+COPY pyproject.toml uv.lock /build/
 
-      - name: Configure Docker for Artifact Registry
-        run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+RUN set -eux; \
+    # FIX uv.lock before using --locked
+    uv lock --rebuild; \
+    \
+    uv export --locked --no-dev -o /tmp/requirements.txt; \
+    python -m venv "$VENV_PATH"; \
+    "$VENV_PATH/bin/pip" install --upgrade pip; \
+    "$VENV_PATH/bin/pip" install --no-cache-dir --require-hashes -r /tmp/requirements.txt; \
+    \
+    mkdir -p "$INTELLIGENCE_PATH/nltk_data"; \
+    NLTK_DATA="$INTELLIGENCE_PATH/nltk_data" "$VENV_PATH/bin/python" -m nltk.downloader \
+        -d "$INTELLIGENCE_PATH/nltk_data" punkt stopwords wordnet averaged_perceptron_tagger omw; \
+    rm -f /tmp/requirements.txt
 
-      - name: Build docker-compose images
-        run: |
-          docker compose build
 
-      - name: Tag & Push images
-        run: |
-          PROJECT="konaai-dev-462909"
-          REPO="konaai-gke"
-          REG="us-central1-docker.pkg.dev"
+###############################################
+# STAGE 2 — RUNTIME
+###############################################
+FROM python:3.12-slim-bookworm AS runtime
 
-          # Define image names in Google Artifact Registry
-          WEB_IMAGE="$REG/$PROJECT/$REPO/web"
-          WORKER_IMAGE="$REG/$PROJECT/$REPO/worker"
-          SCHEDULER_IMAGE="$REG/$PROJECT/$REPO/scheduler"
+ENV INTELLIGENCE_PATH=/KonaAI_ML/var \
+    VENV_PATH=/KonaAI_ML/.venv \
+    PYTHONPATH=/code \
+    PATH="/KonaAI_ML/.venv/bin:${PATH}" \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    NLTK_DATA=/KonaAI_ML/var/nltk_data
 
-          # Tag the images built by docker-compose
-          docker tag konaai-ml:web      $WEB_IMAGE:${{ github.sha }}
-          docker tag konaai-ml:worker   $WORKER_IMAGE:${{ github.sha }}
-          docker tag konaai-ml:scheduler $SCHEDULER_IMAGE:${{ github.sha }}
+WORKDIR /code
 
-          # Push SHA tags
-          docker push $WEB_IMAGE:${{ github.sha }}
-          docker push $WORKER_IMAGE:${{ github.sha }}
-          docker push $SCHEDULER_IMAGE:${{ github.sha }}
+RUN set -eux; \
+    apt-get update && apt-get install -y --no-install-recommends \
+        curl gnupg ca-certificates unixodbc libgomp1; \
+    \
+    curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \
+        | gpg --dearmor -o /etc/apt/trusted.gpg.d/microsoft.gpg; \
+    echo "deb [arch=amd64] https://packages.microsoft.com/debian/12/prod bookworm main" \
+        > /etc/apt/sources.list.d/mssql-release.list; \
+    apt-get update; \
+    ACCEPT_EULA=Y apt-get install -y msodbcsql18; \
+    rm -rf /var/lib/apt/lists/*; \
+    \
+    groupadd -r kona || true; \
+    useradd -r -m -g kona kona || true; \
+    mkdir -p "$INTELLIGENCE_PATH"; \
+    chown -R kona:kona /code "$INTELLIGENCE_PATH"
 
-          # Push "latest" tags
-          docker tag konaai-ml:web      $WEB_IMAGE:latest
-          docker tag konaai-ml:worker   $WORKER_IMAGE:latest
-          docker tag konaai-ml:scheduler $SCHEDULER_IMAGE:latest
+COPY --from=builder /KonaAI_ML/.venv /KonaAI_ML/.venv
+COPY --from=builder /KonaAI_ML/var/nltk_data /KonaAI_ML/var/nltk_data
 
-          docker push $WEB_IMAGE:latest
-          docker push $WORKER_IMAGE:latest
-          docker push $SCHEDULER_IMAGE:latest
+COPY --chown=kona:kona code/ /code/
+
+USER kona
+
+###############################################
+# TARGETS
+###############################################
+FROM runtime AS web
+EXPOSE 8000
+CMD ["python", "-m", "src.setup_service", "web", "--port", "8000"]
+
+FROM runtime AS worker
+CMD ["python", "-m", "src.setup_service", "worker"]
+
+FROM runtime AS scheduler
+CMD ["python", "-m", "src.setup_service", "scheduler"]
