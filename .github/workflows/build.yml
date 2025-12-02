@@ -51,15 +51,15 @@ jobs:
           docker tag konaai-ml:scheduler $SCHEDULER_IMAGE:${{ github.sha }}
 
           # Push SHA tags
-          docker push $WEB_IMAGE:${{ github.sha }}
-          docker push $WORKER_IMAGE:${{ github.sha }}
-          docker push $SCHEDULER_IMAGE:${{ github.sha }}
+          docker push us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml-web:${{ github.sha }}
+          docker push us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml-worker:${{ github.sha }}
+          docker push us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml-scheduler:${{ github.sha }}
 
-          # Push "latest" tags
-          docker tag konaai-ml:web      $WEB_IMAGE:latest
-          docker tag konaai-ml:worker   $WORKER_IMAGE:latest
-          docker tag konaai-ml:scheduler $SCHEDULER_IMAGE:latest
+          # # Push "latest" tags
+          # docker tag konaai-ml:web      $WEB_IMAGE:latest
+          # docker tag konaai-ml:worker   $WORKER_IMAGE:latest
+          # docker tag konaai-ml:scheduler $SCHEDULER_IMAGE:latest
 
-          docker push $WEB_IMAGE:latest
-          docker push $WORKER_IMAGE:latest
-          docker push $SCHEDULER_IMAGE:latest
+          # docker push $WEB_IMAGE:latest
+          # docker push $WORKER_IMAGE:latest
+          # docker push $SCHEDULER_IMAGE:latest
