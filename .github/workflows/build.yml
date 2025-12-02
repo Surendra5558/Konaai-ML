@@ -38,7 +38,7 @@ jobs:
         run: |
           PROJECT="konaai-dev-462909"
           REPO="konaai-gke"
-          REG="us-central1-docker.pkg.dev"
+          REG="us-central1"
 
           # Define image names in Google Artifact Registry
           WEB_IMAGE="$REG/$PROJECT/$REPO/web"
