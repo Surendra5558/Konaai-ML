@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       creds: ${{ steps.auth.outputs.credentials }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -20,46 +21,86 @@ jobs:
           credentials_json: ${{ secrets.GKE_LOGIN_SERVER }}
 
   build:
-    name: Build & Push Docker Compose Images
+    name: Build Docker Images
     runs-on: ubuntu-latest
     needs: setup
+
+    outputs:
+      web: ${{ steps.save.outputs.web }}
+      worker: ${{ steps.save.outputs.worker }}
+      scheduler: ${{ steps.save.outputs.scheduler }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Build docker-compose images
+        run: docker compose build
+
+      # Save built images as tar files for next job
+      - name: Save images
+        id: save
+        run: |
+          mkdir images
+          docker save -o images/web.tar konaai-ml:web
+          docker save -o images/worker.tar konaai-ml:worker
+          docker save -o images/scheduler.tar konaai-ml:scheduler
+        shell: bash
+
+      - name: Upload images
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-images
+          path: images/*.tar
+
+  push:
+    name: Push Images to Artifact Registry
+    runs-on: ubuntu-latest
+    needs: [setup, build]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download built images
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-images
+          path: images
+
+      - name: Load images
+        run: |
+          docker load -i images/web.tar
+          docker load -i images/worker.tar
+          docker load -i images/scheduler.tar
+
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
 
-      - name: Build docker-compose images
+      - name: Tag & Push images
         run: |
-          docker compose build
-  push:
-   name: push
-   runs-on: ubuntu-latest
-   needs: setup
-   steps:
-      - name : push
-        run: |
-          # Define image names in Google Artifact Registry
-          WEB_IMAGE="us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml"
-          WORKER_IMAGE="us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml"
-          SCHEDULER_IMAGE="us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml"
+          PROJECT="konaai-dev-462909"
+          REPO="konaai-gke"
+          REG="us-central1-docker.pkg.dev"
 
-          # Tag the images built by docker-compose
-          docker  $WEB_IMAGE:${{ github.sha }}
-          docker  $WORKER_IMAGE:${{ github.sha }}
-          docker  $SCHEDULER_IMAGE:${{ github.sha }}
+          WEB_IMAGE="$REG/$PROJECT/$REPO/web"
+          WORKER_IMAGE="$REG/$PROJECT/$REPO/worker"
+          SCHEDULER_IMAGE="$REG/$PROJECT/$REPO/scheduler"
 
-          # Push SHA tags
-          docker push us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml:${{ github.sha }}
-          docker push us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml:${{ github.sha }}
-          docker push us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml:${{ github.sha }}
+          # Tag with SHA
+          docker tag konaai-ml:web $WEB_IMAGE:${{ github.sha }}
+          docker tag konaai-ml:worker $WORKER_IMAGE:${{ github.sha }}
+          docker tag konaai-ml:scheduler $SCHEDULER_IMAGE:${{ github.sha }}
 
-          # # Push "latest" tags
-          # docker tag konaai-ml:web      $WEB_IMAGE:latest
-          # docker tag konaai-ml:worker   $WORKER_IMAGE:latest
-          # docker tag konaai-ml:scheduler $SCHEDULER_IMAGE:latest
+          docker push $WEB_IMAGE:${{ github.sha }}
+          docker push $WORKER_IMAGE:${{ github.sha }}
+          docker push $SCHEDULER_IMAGE:${{ github.sha }}
 
-          # docker push $WEB_IMAGE:latest
-          # docker push $WORKER_IMAGE:latest
-          # docker push $SCHEDULER_IMAGE:latest
+          # Push "latest" tag
+          docker tag konaai-ml:web $WEB_IMAGE:latest
+          docker tag konaai-ml:worker $WORKER_IMAGE:latest
+          docker tag konaai-ml:scheduler $SCHEDULER_IMAGE:latest
+
+          docker push $WEB_IMAGE:latest
+          docker push $WORKER_IMAGE:latest
+          docker push $SCHEDULER_IMAGE:latest
