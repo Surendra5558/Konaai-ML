@@ -41,9 +41,9 @@ jobs:
           REG="us-central1"
 
           # Define image names in Google Artifact Registry
-          WEB_IMAGE="$REG/$PROJECT/$REPO/web"
-          WORKER_IMAGE="$REG/$PROJECT/$REPO/worker"
-          SCHEDULER_IMAGE="$REG/$PROJECT/$REPO/scheduler"
+          WEB_IMAGE="us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml-web"
+          WORKER_IMAGE="us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml-worker"
+          SCHEDULER_IMAGE="us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml-scheduler"
 
           # Tag the images built by docker-compose
           docker tag konaai-ml:web      $WEB_IMAGE:${{ github.sha }}
