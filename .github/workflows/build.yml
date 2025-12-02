@@ -32,32 +32,30 @@ jobs:
 
       - name: Build docker-compose images
         run: |
-          docker compose build
-  push:
-   name: push
-   runs-on: ubuntu-latest
-   needs: setup
-   steps:
-      - name : push
+          docker compose build -t us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml:${{ github.sha }}
+
+      - name: Tag & Push images
         run: |
-          PROJECT="konaai-dev-462909"
-          REPO="konaai-gke"
-          REG="us-central1"
+          # PROJECT="konaai-dev-462909"
+          # REPO="konaai-gke"
+          # REG="us-central1"
 
-          # Define image names in Google Artifact Registry
-          WEB_IMAGE="us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml"
-          WORKER_IMAGE="us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml"
-          SCHEDULER_IMAGE="us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml"
+          # # Define image names in Google Artifact Registry
+          # WEB_IMAGE="$REG/$PROJECT/$REPO/web"
+          # WORKER_IMAGE="$REG/$PROJECT/$REPO/worker"
+          # SCHEDULER_IMAGE="$REG/$PROJECT/$REPO/scheduler"
+          IMAGE=us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml
+          docker push $IMAGE:${{ github.sha }}
 
-          # Tag the images built by docker-compose
-          docker tag konaai-ml:web      $WEB_IMAGE:${{ github.sha }}
-          docker tag konaai-ml:worker   $WORKER_IMAGE:${{ github.sha }}
-          docker tag konaai-ml:scheduler $SCHEDULER_IMAGE:${{ github.sha }}
+          # # Tag the images built by docker-compose
+          # docker tag konaai-ml:web      $WEB_IMAGE:${{ github.sha }}
+          # docker tag konaai-ml:worker   $WORKER_IMAGE:${{ github.sha }}
+          # docker tag konaai-ml:scheduler $SCHEDULER_IMAGE:${{ github.sha }}
 
-          # Push SHA tags
-          docker push us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml:${{ github.sha }}
-          docker push us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml:${{ github.sha }}
-          docker push us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml:${{ github.sha }}
+          # # Push SHA tags
+          # docker push $WEB_IMAGE:${{ github.sha }}
+          # docker push $WORKER_IMAGE:${{ github.sha }}
+          # docker push $SCHEDULER_IMAGE:${{ github.sha }}
 
           # # Push "latest" tags
           # docker tag konaai-ml:web      $WEB_IMAGE:latest
