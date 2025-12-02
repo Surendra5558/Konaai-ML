@@ -1,0 +1,68 @@
+# docker-compose.yml
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: rabbitmq
+    hostname: rabbitmq-dev
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: "konaai"
+      RABBITMQ_DEFAULT_PASS: "mluser"
+      RABBITMQ_DEFAULT_VHOST: "kona_vhost"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: web
+    image: konaai-ml:web
+    container_name: konaai-web
+    environment:
+      PORT: "8000"
+      INTELLIGENCE_PATH: /KonaAI_ML/var
+    ports:
+      - "80:8000"
+    volumes:
+      - konaai_var:/KonaAI_ML/var
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: worker
+    image: konaai-ml:worker
+    container_name: konaai-worker
+    environment:
+      INTELLIGENCE_PATH: /KonaAI_ML/var
+    volumes:
+      - konaai_var:/KonaAI_ML/var
+    restart: unless-stopped
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: scheduler
+    image: konaai-ml:scheduler
+    container_name: konaai-scheduler
+    environment:
+      INTELLIGENCE_PATH: /KonaAI_ML/var
+    volumes:
+      - konaai_var:/KonaAI_ML/var
+    restart: unless-stopped
+
+volumes:
+  konaai_var:
+  rabbitmq_data:
