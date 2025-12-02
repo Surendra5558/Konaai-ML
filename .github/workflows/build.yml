@@ -33,8 +33,12 @@ jobs:
       - name: Build docker-compose images
         run: |
           docker compose build
-
-      - name: Tag & Push images
+  push:
+   name: push
+   runs-on: ubuntu-latest
+   needs: setup
+   steps:
+      - name : push
         run: |
           PROJECT="konaai-dev-462909"
           REPO="konaai-gke"
