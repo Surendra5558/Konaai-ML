@@ -1,0 +1,19 @@
+services:
+  web:
+    environment:
+      INTELLIGENCE_PATH: /code/data
+    volumes:
+      - ${INTELLIGENCE_PATH}:/code/data
+  worker:
+    environment:
+      INTELLIGENCE_PATH: /code/data
+    volumes:
+      - "${INTELLIGENCE_PATH}:/code/data"
+
+  scheduler:
+    environment:
+      INTELLIGENCE_PATH: /code/data
+    volumes:
+      - "${INTELLIGENCE_PATH}:/code/data"
+      
+volumes: {}

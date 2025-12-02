@@ -1,0 +1,8 @@
+credentials:
+  usernames:
+    konaai:
+      email:
+      name: konaAI ML user
+      password: '$2b$12$l/4ek.rsPbpWTQXrfXh3yOAhFCL1uUJkkxK/xFV.ecj60lCM9gxVu'
+secret:
+  salt: '$2b$12$l/4ek.rsPbpWTQXrfXh3yO'

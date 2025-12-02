@@ -1,0 +1,156 @@
+
+logs/*
+reports/*
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+
+# Translations
+*.mo
+*.pot
+
+# data files
+*.parquet
+
+# Django stuff:
+*.log
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+
+
+# Database
+*.db
+*.rdb
+
+# Pycharm
+.idea
+
+# Spyder
+.spyproject/
+
+# Jupyter NB Checkpoints
+.ipynb_checkpoints/
+
+# exclude data from source control by default
+/data/
+
+# Mac OS-specific storage files
+.DS_Store
+
+# vim
+*.swp
+*.swo
+
+# Mypy cache
+.mypy_cache/
+code/testing_api/.pytest_cache
+code/logs/*
+code/testing_api/*.html
+code/testing_api/*.css
+code/runs
+code/temp/*
+
+
+# ignoring csv
+*.csv
+
+# ignore all items in db folder
+code/db/
+
+# ignore notebooks folder
+*.tar
+.env
+
+# ignoring pytest reports
+report/
+Redis-x64/
+Redis/
+.pyenv/
+pip-cache/
+prof/
+mlruns/
+
+# ignore all items in nltk_data folder except for .zip files
+nltk_data/corpora/*
+!nltk_data/corpora/*.zip
+!nltk_data/corpora/*.py
+nltk_data/tokenizers/*
+!nltk_data/tokenizers/*.zip
+!nltk_data/tokenizers/*.py
+nltk_data/taggers/*
+!nltk_data/taggers/*.zip
+!nltk_data/taggers/*.py
+
+# ignore celery beat schedule
+celerybeat-schedule.*
+.nicegui/
+code/src/webserver.py
+
+# exclude nicegui files
+code/src/.nicegui/
+.nicegui/
+code/.nicegui/
+project_data/
+code/src/chat_handler/checkpoints/
+code/src/sql_agent/checkpoints/checkpoint-8/config_sentence_transformers.json
+code/src/sql_agent/checkpoints/checkpoint-8/config.json
+code/src/sql_agent/checkpoints/checkpoint-8/model.safetensors
+code/src/sql_agent/checkpoints/checkpoint-8/modules.json
+code/src/sql_agent/checkpoints/checkpoint-8/optimizer.pt
+code/src/sql_agent/checkpoints/checkpoint-8/README.md
+code/src/sql_agent/checkpoints/checkpoint-8/rng_state.pth
+code/src/sql_agent/checkpoints/checkpoint-8/scheduler.pt
+code/src/sql_agent/checkpoints/checkpoint-8/sentence_bert_config.json
+code/src/sql_agent/checkpoints/checkpoint-8/special_tokens_map.json
+code/src/sql_agent/checkpoints/checkpoint-8/tokenizer_config.json
+code/src/sql_agent/checkpoints/checkpoint-8/tokenizer.json
+code/src/sql_agent/checkpoints/checkpoint-8/trainer_state.json
+code/src/sql_agent/checkpoints/checkpoint-8/training_args.bin
+code/src/sql_agent/checkpoints/checkpoint-8/vocab.txt
+code/src/sql_agent/checkpoints/checkpoint-8/1_Pooling/config.json

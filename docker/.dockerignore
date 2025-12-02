@@ -1,0 +1,96 @@
+# Root-level .dockerignore for building docker/Dockerfile with context at project root
+# Docker only reads .dockerignore from the build context root. The previous docker/.dockerignore is ignored
+# when using `build.context: ..` in docker-compose.yml.
+
+# VCS
+.git
+.gitignore
+
+# Python cache/artifacts
+**/__pycache__/
+**/*.py[cod]
+**/*.pyo
+*.pyd
+*.so
+.eggs/
+*.egg-info/
+*.egg
+build/
+dist/
+
+# Virtual environments
+.venv/
+**/.venv/
+venv/
+env/
+
+# Testing and tooling caches
+.pytest_cache/
+.tox/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+.pre-commit-config.yaml
+pylint.rc
+
+# Editors/IDE/OS
+.vscode/
+.vs/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Project runtime/output dirs not needed in image
+mlruns/
+service_logs/
+var/
+nltk_data/
+cache*/
+cachedir/
+joblib/
+
+# Windows-only deployment helpers (not needed in container build)
+windows_deployment/
+windows_build.ps1
+nssm/
+
+# App-specific legacy/local runtime dirs (now using INTELLIGENCE_PATH instead)
+code/logs/
+code/temp/
+code/db/
+
+# Local databases and temp data at repo root
+_db/
+db/
+
+# Notebooks and large local data
+notebooks/
+**/*.ipynb
+code/src/automl/mlruns/
+data_generators/data/
+
+# CI/CD files not required for image build context
+azure-*.yml
+azure-*.yaml
+azure-demo-deploy.yml
+azure-prod-deploy.yml
+azure-prod-pipeline.yml
+azure-pipelines.yml
+azure-pipelines-1.yml
+
+# Docker Compose files not required inside image
+# (Do not ignore docker/Dockerfile; it is referenced explicitly by the build)
+docker/docker-compose.yml
+
+docker/docker-compose.*.yml
+
+# Environment files
+.env
+**/*.env
+
+# Keep only what the Dockerfile needs from project root
+!pyproject.toml
+!uv.lock
+!code/**

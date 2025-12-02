@@ -1,0 +1,20 @@
+{
+    // add extra paths to look for files
+    "python.autoComplete.extraPaths": [
+        "${workspaceFolder}/code",
+    ],
+    // add extra paths to look for files
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/code",
+    ],
+    // add extra paths to look for files
+    "terminal.integrated.env.windows": {
+        "PYTHONPATH": "${workspaceFolder}/code"
+    },
+    "terminal.integrated.env.linux": {
+        "PYTHONPATH": "${workspaceFolder}/code"
+    },
+    "terminal.integrated.env.osx": {
+        "PYTHONPATH": "${workspaceFolder}/code"
+    },
+}

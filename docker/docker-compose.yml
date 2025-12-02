@@ -1,0 +1,47 @@
+
+volumes:
+  # Persists ALL runtime data (logs, db, temp, nltk_data, etc.)
+  konaai_var:
+  # Persists RabbitMQ queues, users, and vhosts
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: web
+    image: konaai-ml:web
+    container_name: konaai-web
+    environment:
+      INTELLIGENCE_PATH: /code/var
+      PORT: "80"
+    ports:
+      - "80:80"
+    volumes:
+      - konaai_var:/code/var
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: worker
+    image: konaai-ml:worker
+    container_name: konaai-worker
+    environment:
+      INTELLIGENCE_PATH: /code/var
+    volumes:
+      - konaai_var:/code/var
+    restart: unless-stopped
+
+  scheduler:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: scheduler
+    image: konaai-ml:scheduler
+    container_name: konaai-scheduler
+    environment:
+      INTELLIGENCE_PATH: /code/var
+    volumes:
+      - konaai_var:/code/var
+    restart: unless-stopped

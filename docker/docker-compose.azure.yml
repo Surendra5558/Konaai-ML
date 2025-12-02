@@ -1,0 +1,21 @@
+services:
+  web:
+    volumes:
+      - intelligence_data:/code/data
+
+  worker:
+    volumes:
+      - intelligence_data:/code/data
+
+  scheduler:
+    volumes:
+      - intelligence_data:/code/data
+
+volumes:
+  # Declared but not defined; each environment decides what backs this.
+  intelligence_data:
+    driver: local
+    driver_opts:
+        type: "cifs"
+        o: "username=${AZURE_STORAGE_ACCOUNT},password=${AZURE_STORAGE_KEY},file_mode=0770,dir_mode=0770,serverino"
+        device: "//${AZURE_STORAGE_ACCOUNT}.file.core.windows.net/${AZURE_FILE_SHARE}"
