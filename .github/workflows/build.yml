@@ -40,19 +40,15 @@ jobs:
    steps:
       - name : push
         run: |
-          PROJECT="konaai-dev-462909"
-          REPO="konaai-gke"
-          REG="us-central1"
-
           # Define image names in Google Artifact Registry
           WEB_IMAGE="us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml"
           WORKER_IMAGE="us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml"
           SCHEDULER_IMAGE="us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml"
 
           # Tag the images built by docker-compose
-          docker tag konaai-ml:web      $WEB_IMAGE:${{ github.sha }}
-          docker tag konaai-ml:worker   $WORKER_IMAGE:${{ github.sha }}
-          docker tag konaai-ml:scheduler $SCHEDULER_IMAGE:${{ github.sha }}
+          docker  $WEB_IMAGE:${{ github.sha }}
+          docker  $WORKER_IMAGE:${{ github.sha }}
+          docker  $SCHEDULER_IMAGE:${{ github.sha }}
 
           # Push SHA tags
           docker push us-central1-docker.pkg.dev/konaai-dev-462909/konaai-gke/ml:${{ github.sha }}
